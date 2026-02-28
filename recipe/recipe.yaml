@@ -16,8 +16,9 @@ source:
     - cross-compile-get-torch.patch
 
 build:
-  number: 2
+  number: 3
   skip: cuda_compiler_version == "None" or win or osx
+  string: torch${{ pytorch | replace(".", "") | replace("*", "") }}_cuda${{ cuda_compiler_version | replace(".", "") }}_py${{ python | version_to_buildstring }}_h${{ hash }}_${{ build_number }}
   script:
     env:
       TORCH_CUDA_ARCH_LIST: ${{ "9.0;10.0+PTX" if target_platform == "linux-aarch64" else "7.5;8.0;9.0;10.0;12.0+PTX" }}
@@ -44,7 +45,7 @@ requirements:
     - python
     - scikit-build-core
     - pip
-    - pytorch <2.10[build="*${{ torch_proc_type }}*"]
+    - pytorch ${{ pytorch }}.*[build="*${{ torch_proc_type }}*"]
     - numpy
     - pybind11 >=2.13
     - gitpython
@@ -61,7 +62,7 @@ requirements:
     - zlib
   run:
     - python
-    - pytorch <2.10[build="*${{ torch_proc_type }}*"]
+    - pytorch ${{ pytorch }}.*[build="*${{ torch_proc_type }}*"]
     - ${{ pin_compatible('numpy') }}
     - if: cuda_compiler_version != "None"
       then: cuda-version ==${{ cuda_compiler_version }}

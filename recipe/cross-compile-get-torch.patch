@@ -1,38 +1,31 @@
 diff --git a/src/cmake/get_torch.cmake b/src/cmake/get_torch.cmake
 --- a/src/cmake/get_torch.cmake
 +++ b/src/cmake/get_torch.cmake
-@@ -18,7 +18,8 @@
+@@ -18,10 +18,13 @@
    RESULT_VARIABLE TORCH_IMPORT_RESULT)
- 
+
  if(NOT TORCH_IMPORT_RESULT EQUAL 0)
 -  message(FATAL_ERROR "Failed to import PyTorch. Please ensure PyTorch is installed in the conda environment.")
+-endif()
+-
+-list(GET TORCH_CXX11_ABI_AND_PACKAGE_DIR 0 TORCH_CXX11_ABI)
+-list(GET TORCH_CXX11_ABI_AND_PACKAGE_DIR 1 TORCH_PACKAGE_DIR)
 +  message(STATUS "Cannot import PyTorch (cross-compiling?). Assuming CXX11 ABI is enabled.")
 +  set(TORCH_CXX11_ABI True)
- endif()
- 
- if(NOT TORCH_CXX11_ABI)
-@@ -26,14 +27,27 @@
-     "Please install PyTorch with the C++11 ABI (e.g. conda-forge package).")
- endif()
- 
--# find site-packages directory
--execute_process(
--  COMMAND "${CMAKE_COMMAND}" -E env PYTHONPATH="${Python3_SITELIB}" "${Python3_EXECUTABLE}" -c "import os; import torch; print(os.path.dirname(torch.__file__))"
--  OUTPUT_VARIABLE TORCH_PACKAGE_DIR
--  OUTPUT_STRIP_TRAILING_WHITESPACE)
-+# find torch package directory
-+if(TORCH_IMPORT_RESULT EQUAL 0)
-+  execute_process(
-+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONPATH="${Python3_SITELIB}" "${Python3_EXECUTABLE}" -c "import os; import torch; print(os.path.dirname(torch.__file__))"
-+    OUTPUT_VARIABLE TORCH_PACKAGE_DIR
-+    OUTPUT_STRIP_TRAILING_WHITESPACE)
-+else()
 +  set(TORCH_PACKAGE_DIR "${Python3_SITELIB}/torch")
 +  message(STATUS "Cannot import PyTorch. Using TORCH_PACKAGE_DIR=${TORCH_PACKAGE_DIR}")
++else()
++  list(GET TORCH_CXX11_ABI_AND_PACKAGE_DIR 0 TORCH_CXX11_ABI)
++  list(GET TORCH_CXX11_ABI_AND_PACKAGE_DIR 1 TORCH_PACKAGE_DIR)
 +endif()
- 
+
+ if(NOT TORCH_CXX11_ABI)
+@@ -30,8 +33,16 @@
+ endif()
+
 -# needed to correctly configure Torch with the conda-forge build
 -if(DEFINED ENV{CONDA_PREFIX})
+-  set(CUDA_TOOLKIT_ROOT_DIR "$ENV{CONDA_PREFIX}/targets/x86_64-linux")
 +# needed to correctly configure Torch with the conda-forge build;
 +# use PREFIX (host prefix) when available for cross-compilation support,
 +# falling back to CONDA_PREFIX for local builds
@@ -43,6 +36,7 @@ diff --git a/src/cmake/get_torch.cmake b/src/cmake/get_torch.cmake
 +    set(CUDA_TOOLKIT_ROOT_DIR "$ENV{PREFIX}/targets/x86_64-linux")
 +  endif()
 +elseif(DEFINED ENV{CONDA_PREFIX})
-   set(CUDA_TOOLKIT_ROOT_DIR "$ENV{CONDA_PREFIX}/targets/x86_64-linux")
++  set(CUDA_TOOLKIT_ROOT_DIR "$ENV{CONDA_PREFIX}/targets/x86_64-linux")
  endif()
- 
+
+ find_package(Torch REQUIRED PATHS "${TORCH_PACKAGE_DIR}/share/cmake/Torch")

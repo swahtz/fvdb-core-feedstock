@@ -16,12 +16,12 @@ source:
     - cross-compile-get-torch.patch
 
 build:
-  number: 0
+  number: 1
   skip: cuda_compiler_version == "None" or win or osx
   string: torch${{ pytorch | replace(".", "") | replace("*", "") }}_cuda${{ cuda_compiler_version | replace(".", "") }}_py${{ python | version_to_buildstring }}_h${{ hash }}_${{ build_number }}
   script:
     env:
-      TORCH_CUDA_ARCH_LIST: ${{ "9.0;10.0+PTX" if target_platform == "linux-aarch64" else "7.5;8.0;9.0;10.0;12.0+PTX" }}
+      TORCH_CUDA_ARCH_LIST: ${{ "9.0;10.0;11.0;12.1+PTX" if target_platform == "linux-aarch64" else "7.5;8.0;9.0;10.0;12.0+PTX" }}
 
 requirements:
   build:

@@ -16,7 +16,7 @@ source:
     - cross-compile-get-torch.patch
 
 build:
-  number: 2
+  number: 3
   skip: cuda_compiler_version == "None" or win or osx
   string: torch${{ pytorch | replace(".", "") | replace("*", "") }}_cuda${{ cuda_compiler_version | replace(".", "") }}_py${{ python | version_to_buildstring }}_h${{ hash }}_${{ build_number }}
   script:
@@ -33,8 +33,6 @@ requirements:
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
     - ${{ compiler('cuda') }}
-    - if: cuda_compiler_version != "None"
-      then: cuda-version ==${{ cuda_compiler_version }}
     - cmake >=3.25
     - ninja
     - pkg-config
@@ -65,7 +63,7 @@ requirements:
     - pytorch ${{ pytorch }}.*[build="*${{ torch_proc_type }}*"]
     - ${{ pin_compatible('numpy') }}
     - if: cuda_compiler_version != "None"
-      then: cuda-version ==${{ cuda_compiler_version }}
+      then: cuda-version =${{ cuda_compiler_version }}
     - gitpython
     - git
     - parameterized

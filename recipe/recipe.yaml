@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: fvdb-core
-  version: 0.4.0
+  version: "0.4.2"
   torch_proc_type: ${{ "cuda" if cuda_compiler_version != "None" else "cpu" }}
 
 package:
@@ -11,12 +11,12 @@ package:
 
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/fvdb_core-${{ version }}.tar.gz
-  sha256: ccae61a586f4cf23be1192b580aba0a90fa38762d1e7084ea87109c6c24f4cdf
+  sha256: 6f6569fb6ad9bb4aeafefe48472cb24817504f6f8d88046b67f61b3f92966c00
   patches:
     - cross-compile-get-torch.patch
 
 build:
-  number: 2
+  number: 0
   skip: cuda_compiler_version == "None" or win or osx
   string: torch${{ pytorch | replace(".", "") | replace("*", "") }}_cuda${{ cuda_compiler_version | replace(".", "") }}_py${{ python | version_to_buildstring }}_h${{ hash }}_${{ build_number }}
   script:

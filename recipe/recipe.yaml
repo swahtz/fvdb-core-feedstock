@@ -16,7 +16,7 @@ source:
     - cross-compile-get-torch.patch
 
 build:
-  number: 1
+  number: 2
   skip: cuda_compiler_version == "None" or win or osx
   string: torch${{ pytorch | replace(".", "") | replace("*", "") }}_cuda${{ cuda_compiler_version | replace(".", "") }}_py${{ python | version_to_buildstring }}_h${{ hash }}_${{ build_number }}
   script:
@@ -53,7 +53,6 @@ requirements:
     - cuda-nvrtc-dev
     - cuda-nvtx-dev
     - libcublas-dev
-    - libcudnn-dev
     - libcusolver-dev
     - libcusparse-dev
     - libpng

@@ -53,6 +53,8 @@ requirements:
     - cuda-cudart-dev
     - cuda-nvrtc-dev
     - cuda-nvtx-dev
+    - libcublas-dev
+    - libcusparse-dev
     - libpng
     - zlib
   run:

@@ -17,19 +17,23 @@ setup_parallel_build_jobs() {
   if [ "$NUM_ARCH" -lt 1 ]; then
     NUM_ARCH=1
   fi
-  NVCC_THREADS=$NUM_ARCH
+  if [ -n "$NVCC_THREADS" ]; then
+    echo "Using pre-set NVCC_THREADS=$NVCC_THREADS"
+  else
+    NVCC_THREADS=$NUM_ARCH
 
-  # Check if we have enough RAM for even one job with full NVCC_THREADS
-  # Requirement: JOB_RAM_GB * NVCC_THREADS
-  MIN_RAM_REQUIRED=$((JOB_RAM_GB * NVCC_THREADS))
+    # Check if we have enough RAM for even one job with full NVCC_THREADS
+    # Requirement: JOB_RAM_GB * NVCC_THREADS
+    MIN_RAM_REQUIRED=$((JOB_RAM_GB * NVCC_THREADS))
 
-  if [ "$RAM_GB" -lt "$MIN_RAM_REQUIRED" ]; then
-      NVCC_THREADS=1
-  fi
+    if [ "$RAM_GB" -lt "$MIN_RAM_REQUIRED" ]; then
+        NVCC_THREADS=1
+    fi
 
-  # Limit NVCC_THREADS to NPROC to ensure we don't oversubscribe
-  if [ "$NVCC_THREADS" -gt "$NPROC" ]; then
-      NVCC_THREADS=$NPROC
+    # Limit NVCC_THREADS to NPROC to ensure we don't oversubscribe
+    if [ "$NVCC_THREADS" -gt "$NPROC" ]; then
+        NVCC_THREADS=$NPROC
+    fi
   fi
 
   # Determine max jobs based on CPU:

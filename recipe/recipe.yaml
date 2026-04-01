@@ -51,6 +51,7 @@ requirements:
     - if: cuda_compiler_version != "None"
       then: cuda-version ==${{ cuda_compiler_version }}
     - cuda-cudart-dev
+    - cuda-nvrtc-dev
     - cuda-nvtx-dev
     - libpng
     - zlib
